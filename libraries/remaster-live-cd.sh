@@ -387,6 +387,9 @@ function prepare_rootfs_for_chroot()
 	echo "Deactivating initctl..."
 	chroot "$REMASTER_DIR" mv /sbin/initctl /sbin/initctl.uck_blocked
 	chroot "$REMASTER_DIR" ln -s /bin/true /sbin/initctl
+
+	echo "Hacking invoke-rc.d to ignore missing init scripts..."
+	chroot "$REMASTER_DIR" sed -i -e "s/exit 100/exit 0 #exit 100/" /usr/sbin/invoke-rc.d
 	
 	echo "Deactivating update-grub..."
 	chroot "$REMASTER_DIR" mv /usr/sbin/update-grub /usr/sbin/update-grub.uck_blocked
@@ -428,6 +431,9 @@ function clean_rootfs_after_chroot()
 	echo "Reactivating initctl..."
 	chroot "$REMASTER_DIR" rm /sbin/initctl
 	chroot "$REMASTER_DIR" mv /sbin/initctl.uck_blocked /sbin/initctl
+
+	echo "Restoring invoke-rc.d..."
+	chroot "$REMASTER_DIR" sed -i -e "s/exit 0 #exit 100/exit 100/" /usr/sbin/invoke-rc.d
 	
 	echo "Reactivating update-grub..."
 	chroot "$REMASTER_DIR" rm /usr/sbin/update-grub
