@@ -397,8 +397,8 @@ function prepare_rootfs_for_chroot()
 	chroot "$REMASTER_DIR" ln -s /bin/true /usr/sbin/grub-probe
 
 	echo "Hacking grub-probe postinst/postrm..."
-	chroot "$REMASTER_DIR" sed -i -e "s/exec update-grub/#exec update-grub/" /etc/kernel/postinst.d/zz-update-grub
-	chroot "$REMASTER_DIR" sed -i -e "s/exec update-grub/#exec update-grub/" /etc/kernel/postrm.d/zz-update-grub
+	chroot "$REMASTER_DIR" sed -i -e "s/exec update-grub/true #exec update-grub/" /etc/kernel/postinst.d/zz-update-grub
+	chroot "$REMASTER_DIR" sed -i -e "s/exec update-grub/true #exec update-grub/" /etc/kernel/postrm.d/zz-update-grub
 
 	if [ ! -e "$REMASTER_DIR/scripts" ]; then
 		echo "Linking missing /scripts dir..."
@@ -438,8 +438,8 @@ function clean_rootfs_after_chroot()
 	chroot "$REMASTER_DIR" mv /usr/sbin/grub-probe.uck_blocked /usr/sbin/grub-probe
 
 	echo "Reactivating grub-probe postinst/postrm..."
-	chroot "$REMASTER_DIR" sed -i -e "s/#exec update-grub/exec update-grub/" /etc/kernel/postinst.d/zz-update-grub
-	chroot "$REMASTER_DIR" sed -i -e "s/#exec update-grub/exec update-grub/" /etc/kernel/postrm.d/zz-update-grub
+	chroot "$REMASTER_DIR" sed -i -e "s/true #exec update-grub/exec update-grub/" /etc/kernel/postinst.d/zz-update-grub
+	chroot "$REMASTER_DIR" sed -i -e "s/true #exec update-grub/exec update-grub/" /etc/kernel/postrm.d/zz-update-grub
 	
 	if [ -L "$REMASTER_DIR/scripts" ]; then
 		echo "Removing linked /scripts dir..."
