@@ -400,6 +400,11 @@ function prepare_rootfs_for_chroot()
 	chroot "$REMASTER_DIR" sed -i -e "s/exec update-grub/#exec update-grub/" /etc/kernel/postinst.d/zz-update-grub
 	chroot "$REMASTER_DIR" sed -i -e "s/exec update-grub/#exec update-grub/" /etc/kernel/postrm.d/zz-update-grub
 
+	if [ ! -e "$REMASTER_DIR/scripts" ]; then
+		echo "Linking missing /scripts dir..."
+		chroot "$REMASTER_DIR" ln -s /usr/share/initramfs-tools/scripts /scripts
+	fi
+
 	echo "Remembering kernel update state..."
 	update_flags="reboot-required reboot-required.pkgs do-not-hibernate"
 	varrun="$REMASTER_DIR"/var/run
@@ -436,6 +441,11 @@ function clean_rootfs_after_chroot()
 	chroot "$REMASTER_DIR" sed -i -e "s/#exec update-grub/exec update-grub/" /etc/kernel/postinst.d/zz-update-grub
 	chroot "$REMASTER_DIR" sed -i -e "s/#exec update-grub/exec update-grub/" /etc/kernel/postrm.d/zz-update-grub
 	
+	if [ -L "$REMASTER_DIR/scripts" ]; then
+		echo "Removing linked /scripts dir..."
+		chroot "$REMASTER_DIR" rm /scripts
+	fi
+
 	UCK_USER_HOME_DIR=`xauth info|grep 'Authority file'| sed "s/[ \t]//g" | sed "s/\/\.Xauthority//" | cut -d ':' -f2`
 	if [ `echo $UCK_USER_HOME_DIR | cut -d '/' -f2` == 'home' ] ; then
 		echo "Removing /home/username directory..."
