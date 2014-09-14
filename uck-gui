@@ -144,7 +144,7 @@ You can find your live CD in:
 
 	$LIVECD_ISO_LOCATION
 
-If you have installed the \"qemu\" package, you can test the image by doing:
+If you have installed the "qemu" package, you can test the image by doing:
 
 	qemu -cdrom $LIVECD_ISO_LOCATION -boot d -m 256
 EOF
